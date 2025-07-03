@@ -2,12 +2,12 @@ import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, FacebookAuthProvider, OAuthProvider } from 'firebase/auth';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAMoWYuPh0sc6TwdYH4f57s6Z-GMYJFSmU",
-  authDomain: "gameplan-3f1ef.firebaseapp.com",
-  projectId: "gameplan-3f1ef",
-  storageBucket: "gameplan-3f1ef.firebasestorage.app",
-  messagingSenderId: "1046382404349",
-  appId: "1:1046382404349:web:d9325135335f3b29ecd494"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 
 // Initialize Firebase
