@@ -1,55 +1,57 @@
-import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { useSignupMutation } from '../../app/store';
-import { setCurrentStep, setEmail } from '../../features/authSlice';
-import Card from '../ui/Card';
-import Button from '../ui/Button';
-import SocialLoginButtons from './SocialLoginButtons';
-import Input from '../ui/Input';
+import { useState } from "react";
+import { useDispatch } from "react-redux";
 
+import Card from "../ui/Card";
+import Button from "../ui/Button";
+import SocialLoginButtons from "./SocialLoginButtons";
+import Input from "../ui/Input";
+import { useResendOtpMutation, useSignupMutation } from "../../app/authApi";
+import { setCurrentStep, setEmail } from "../../features/authSlice";
+import { Link, useNavigate } from "react-router-dom";
 
 const SignupForm = () => {
   const [formData, setFormData] = useState({
-    userName: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
+    userName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [errors, setErrors] = useState({});
-
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const [signup, { isLoading }] = useSignupMutation();
+  const [resendOtp] = useResendOtpMutation();
 
   const validateForm = () => {
     const newErrors = {};
 
     if (!formData.userName.trim()) {
-      newErrors.userName = 'User name is required';
+      newErrors.userName = "User name is required";
     }
 
     if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
+      newErrors.email = "Email is required";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email';
+      newErrors.email = "Please enter a valid email";
     }
 
     if (!formData.password) {
-      newErrors.password = 'Password is required';
+      newErrors.password = "Password is required";
     } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
+      newErrors.password = "Password must be at least 6 characters";
     }
 
     if (!formData.confirmPassword) {
-      newErrors.confirmPassword = 'Please confirm your password';
+      newErrors.confirmPassword = "Please confirm your password";
     } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
+      newErrors.confirmPassword = "Passwords do not match";
     }
 
     if (!acceptTerms) {
-      newErrors.terms = 'Please accept the terms and conditions';
+      newErrors.terms = "Please accept the terms and conditions";
     }
 
     setErrors(newErrors);
@@ -58,41 +60,50 @@ const SignupForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
 
     try {
-await signup({
+      await signup({
+        username: formData.userName,
         email: formData.email,
         password: formData.password,
       }).unwrap();
-      
+
+      // Manually resend OTP after signup if not done by backend
+      await resendOtp({
+        email: formData.email,
+      }).unwrap();
+
+      navigate("/verification");
+
       dispatch(setEmail(formData.email));
-      dispatch(setCurrentStep('verification'));
+      dispatch(setCurrentStep("verification"));
     } catch (error) {
-      console.error('Signup failed:', error);
-      setErrors({ 
-        general: error.message || 'Signup failed. Please try again.' 
+      console.error("Signup failed:", error);
+      setErrors({
+        general: error.message || "Signup failed. Please try again.",
       });
     }
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
+      setErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
 
   return (
     <Card>
       <div className="mb-8 text-center">
-        <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-indigo-100 rounded-full">
-          <div className="w-8 h-8 bg-indigo-600 rounded-full"></div>
-        </div>
-        <h1 className="mb-2 text-2xl font-bold text-gray-900">SIGN UP to Account</h1>
-        <p className="text-gray-600">Please enter your email and password to continue</p>
+        <h1 className="mb-2 text-4xl font-medium text-gray-900">
+          SIGN UP to Account
+        </h1>
+        <p className="pt-2 font-sans text-sm font-normal text-gray-600">
+          Please enter your email and password to continue
+        </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -124,7 +135,7 @@ await signup({
         <Input
           label="Password"
           name="password"
-          type={showPassword ? 'text' : 'password'}
+          type={showPassword ? "text" : "password"}
           value={formData.password}
           onChange={handleInputChange}
           error={errors.password}
@@ -137,7 +148,7 @@ await signup({
         <Input
           label="Confirm password"
           name="confirmPassword"
-          type={showConfirmPassword ? 'text' : 'password'}
+          type={showConfirmPassword ? "text" : "password"}
           value={formData.confirmPassword}
           onChange={handleInputChange}
           error={errors.confirmPassword}
@@ -155,16 +166,20 @@ await signup({
             onChange={(e) => {
               setAcceptTerms(e.target.checked);
               if (errors.terms) {
-                setErrors(prev => ({ ...prev, terms: '' }));
+                setErrors((prev) => ({ ...prev, terms: "" }));
               }
             }}
             className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
           />
-          <label htmlFor="terms" className="ml-2 text-sm text-gray-600">
-            By Creating An Account, I Accept The <span className="text-indigo-600">Terms & Conditions</span> & <span className="text-indigo-600">Privacy Policy</span>
+          <label htmlFor="terms" className="ml-2 text-xs text-gray-600">
+            By Creating An Account, I Accept The{" "}
+            <span className="text-indigo-600">Terms & Conditions</span> &{" "}
+            <span className="text-indigo-600">Privacy Policy</span>
           </label>
         </div>
-        {errors.terms && <p className="-mt-4 text-sm text-red-600">{errors.terms}</p>}
+        {errors.terms && (
+          <p className="-mt-4 text-sm text-red-600">{errors.terms}</p>
+        )}
 
         <Button type="submit" isLoading={isLoading} className="w-full">
           SIGN UP
@@ -172,14 +187,16 @@ await signup({
 
         <div className="text-center">
           <p className="text-sm text-gray-600">
-            Already Have An Account?{' '}
-            <button 
-              type="button" 
-              onClick={() => dispatch(setCurrentStep('login'))}
-              className="text-indigo-600 hover:text-indigo-500"
-            >
-              Login
-            </button>
+            Already Have An Account?{" "}
+            <Link to={"/"}>
+              <button
+                type="button"
+                onClick={() => dispatch(setCurrentStep("login"))}
+                className="text-indigo-600 cursor-pointer hover:text-indigo-500"
+              >
+                Login
+              </button>
+            </Link>
           </p>
         </div>
 
