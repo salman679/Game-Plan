@@ -1,13 +1,23 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { authApi } from '../app/store';
-import authReducer from '../features/authSlice'
-
+import authReducer from '../features/authSlice';
+import uiReducer from '../features/uiSlice';
+import chatReducer from '../features/chatSlice';
+import calendarReducer from '../features/calenderSlice';
+import { authApi } from '../app/authApi';
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
+    ui: uiReducer,
+    chat: chatReducer,
+    calendar: calendarReducer,
     [authApi.reducerPath]: authApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(authApi.middleware),
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE'],
+      },
+    }).concat(authApi.middleware),
 });
+
