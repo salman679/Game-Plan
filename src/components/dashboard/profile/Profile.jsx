@@ -1,18 +1,19 @@
 import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { X, User, Camera, Mail } from "lucide-react";
-import {
-  useGetUserAboutQuery,
-  useGetUserProfileQuery,
-  useUpdateUserAboutMutation,
-  useUpdateUserProfileMutation,
-} from "../../../app/authApi";
+
 import {
   addNotification,
   setShowProfileModal,
 } from "../../../features/uiSlice";
 import { setUser } from "../../../features/authSlice";
 import Button from "../../ui/Button";
+import {
+  useGetUserAboutQuery,
+  useGetUserProfileQuery,
+  useUpdateUserAboutMutation,
+  useUpdateUserProfileMutation,
+} from "../../../app/profileApi";
 
 const ProfileModal = ({ isOpen, onClose }) => {
   const { data: user } = useGetUserProfileQuery();

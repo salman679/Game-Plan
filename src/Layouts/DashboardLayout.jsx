@@ -19,10 +19,11 @@ import Button from "../components/ui/Button";
 import TermsModal from "../components/modals/Terms";
 import SupportModal from "../components/modals/Support";
 import SettingsModal from "../components/modals/Setting";
-import { useGetUserProfileQuery, useLogoutMutation } from "../app/authApi";
 import AboutModal from "../components/modals/About";
 import { logout } from "../features/authSlice";
 import { useDispatch } from "react-redux";
+import { useGetUserProfileQuery } from "../app/profileApi";
+import { useLogoutMutation } from "../app/authApi";
 
 const DashboardLayout = () => {
   const { data: user } = useGetUserProfileQuery();

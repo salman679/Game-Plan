@@ -1,9 +1,10 @@
-import { configureStore } from '@reduxjs/toolkit';
-import authReducer from '../features/authSlice';
-import uiReducer from '../features/uiSlice';
-import chatReducer from '../features/chatSlice';
-import calendarReducer from '../features/calenderSlice';
-import { authApi } from '../app/authApi';
+import { configureStore } from "@reduxjs/toolkit";
+import authReducer from "../features/authSlice";
+import uiReducer from "../features/uiSlice";
+import chatReducer from "../features/chatSlice";
+import calendarReducer from "../features/calenderSlice";
+import { authApi } from "../app/authApi";
+import { profileApi } from "../app/profileApi";
 
 export const store = configureStore({
   reducer: {
@@ -16,8 +17,7 @@ export const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
-        ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE'],
+        ignoredActions: ["persist/PERSIST", "persist/REHYDRATE"],
       },
-    }).concat(authApi.middleware),
+    }).concat(authApi.middleware, profileApi.middleware),
 });
-

@@ -1,14 +1,13 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-
 import { X } from "lucide-react";
-import {
-  useCreateUserAboutMutation,
-  useGetUserProfileQuery,
-} from "../../app/authApi";
 import { addNotification } from "../../features/uiSlice";
 import { setUser } from "../../features/authSlice";
 import Button from "../ui/Button";
+import {
+  useCreateUserAboutMutation,
+  useGetUserProfileQuery,
+} from "../../app/profileApi";
 
 const AboutModal = ({ onClose, isOpen }) => {
   const { showAboutModal } = useSelector((state) => state.ui);
