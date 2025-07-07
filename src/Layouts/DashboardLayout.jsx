@@ -1,6 +1,4 @@
-import { useState } from "react";
-import { useSelector } from "react-redux";
-// import { logout } from '../store/slices/authSlice';
+import { useEffect, useState } from "react";
 import {
   User,
   LogOut,
@@ -10,6 +8,8 @@ import {
   Settings,
   Bell,
   Calendar,
+  File,
+  Settings2,
 } from "lucide-react";
 import ChatInterface from "../components/dashboard/chat/Chat";
 import ProfileModal from "../components/dashboard/profile/Profile";
@@ -17,27 +17,43 @@ import FAQSection from "../components/dashboard/faq/Faq";
 import CalendarView from "../components/dashboard/calender/Calender";
 import Button from "../components/ui/Button";
 import TermsModal from "../components/modals/Terms";
+import SupportModal from "../components/modals/Support";
+import SettingsModal from "../components/modals/Setting";
+import { useGetUserProfileQuery, useLogoutMutation } from "../app/authApi";
+import AboutModal from "../components/modals/About";
+import { logout } from "../features/authSlice";
+import { useDispatch } from "react-redux";
 
 const DashboardLayout = () => {
-  const { user } = useSelector((state) => state.auth);
-  // const dispatch = useDispatch();
-  // const [logoutMutation] = useLogoutMutation();
-
+  const { data: user } = useGetUserProfileQuery();
+  const dispatch = useDispatch();
+  const [logoutMutation] = useLogoutMutation();
   const [activeView, setActiveView] = useState("chat");
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showSetting, setShowSetting] = useState(false);
   const [showFAQ, setShowFAQ] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showSupport, setShowSupport] = useState(false);
+  const [showAbout, setShowAbout] = useState(true);
 
-  // const handleLogout = async () => {
-  //   try {
-  //     await logoutMutation().unwrap();
-  //   } catch (error) {
-  //     console.error('Logout failed:', error);
-  //   } finally {
-  //     dispatch(logout());
-  //   }
-  // };
+  const handleLogout = async () => {
+    try {
+      await logoutMutation().unwrap();
+    } catch (error) {
+      console.error("Logout failed:", error);
+    } finally {
+      dispatch(logout());
+    }
+  };
+
+  useEffect(() => {
+    const result = localStorage.getItem("aboutModal");
+
+    if (result === "showed") {
+      setShowAbout(false);
+    }
+  }, []);
 
   const renderActiveView = () => {
     switch (activeView) {
@@ -88,17 +104,6 @@ const DashboardLayout = () => {
             </div>
 
             <div className="flex items-center gap-4">
-              {/* <button
-                onClick={() => setShowFAQ(true)}
-                className="p-2 text-gray-600 transition-colors rounded-lg hover:text-gray-900 hover:bg-gray-100"
-              >
-                <HelpCircle size={20} />
-              </button>
-
-              <button className="p-2 text-gray-600 transition-colors rounded-lg hover:text-gray-900 hover:bg-gray-100">
-                <Bell size={20} />
-              </button> */}
-
               <div className="relative">
                 <button
                   onClick={() => setShowUserMenu(!showUserMenu)}
@@ -129,6 +134,14 @@ const DashboardLayout = () => {
                       Profile
                     </button>
                     <button
+                      onClick={() => setShowSetting(true)}
+                      variant="outline"
+                      className="flex items-center w-full gap-2 px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100"
+                    >
+                      <Settings2 size={16} />
+                      Manage Subscription
+                    </button>
+                    <button
                       onClick={() => setShowFAQ(true)}
                       variant="outline"
                       className="flex items-center w-full gap-2 px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100"
@@ -141,15 +154,19 @@ const DashboardLayout = () => {
                       variant="outline"
                       className="flex items-center w-full gap-2 px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100"
                     >
+                      <File size={16} />
                       Trams & Condition
                     </button>
-                    <button className="flex items-center w-full gap-2 px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
-                      <Settings size={16} />
-                      Settings
+                    <button
+                      className="flex items-center w-full gap-2 px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100"
+                      onClick={() => setShowSupport(true)}
+                    >
+                      <HelpCircle size={16} />
+                      Support
                     </button>
                     <hr className="my-2" />
                     <button
-                      // onClick={handleLogout}
+                      onClick={handleLogout}
                       className="flex items-center w-full gap-2 px-4 py-2 text-sm text-left text-red-600 hover:bg-red-50"
                     >
                       <LogOut size={16} />
@@ -168,9 +185,18 @@ const DashboardLayout = () => {
           isOpen={showProfileModal}
           onClose={() => setShowProfileModal(false)}
         />
-
+        <SettingsModal
+          isOpen={showSetting}
+          onClose={() => setShowSetting(false)}
+        />
+        <SupportModal
+          isOpen={showSupport}
+          onClose={() => setShowSupport(false)}
+        />
         <FAQSection isOpen={showFAQ} onClose={() => setShowFAQ(false)} />
         <TermsModal isOpen={showTerms} onClose={() => setShowTerms(false)} />
+
+        <AboutModal isOpen={showAbout} onClose={() => setShowAbout(false)} />
       </div>
     );
   }

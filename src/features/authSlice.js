@@ -1,17 +1,17 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   user: null,
-  token: localStorage.getItem('authToken') || null,
-  isAuthenticated: !!localStorage.getItem('authToken'),
-  currentStep: 'signup',
-  email: '',
+  token: localStorage.getItem("authToken") || null,
+  isAuthenticated: !!localStorage.getItem("authToken"),
+  currentStep: "signup",
+  email: "",
   isLoading: false,
   error: null,
 };
 
 const authSlice = createSlice({
-  name: 'auth',
+  name: "auth",
   initialState,
   reducers: {
     setCurrentStep: (state, action) => {
@@ -28,9 +28,9 @@ const authSlice = createSlice({
       state.token = action.payload;
       state.isAuthenticated = true;
       if (action.payload) {
-        localStorage.setItem('authToken', action.payload);
+        localStorage.setItem("authToken", action.payload);
       } else {
-        localStorage.removeItem('authToken');
+        localStorage.removeItem("authToken");
       }
     },
     setLoading: (state, action) => {
@@ -43,8 +43,8 @@ const authSlice = createSlice({
       state.user = null;
       state.token = null;
       state.isAuthenticated = false;
-      state.currentStep = 'login';
-      localStorage.removeItem('authToken');
+      state.currentStep = "login";
+      localStorage.removeItem("authToken");
     },
     reset: (state) => {
       state.error = null;

@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 
 import { Send, User, Bot, Calendar, Plus, MoreHorizontal } from "lucide-react";
 import {
-  useAddMessageToChatMutation,
+  // useAddMessageToChatMutation,
   useCreateChatMutation,
   useGetUserChatListQuery,
 } from "../../../app/authApi";
@@ -22,6 +22,8 @@ import Button from "../../ui/Button";
 
 const ChatInterface = () => {
   const { user } = useSelector((state) => state.auth);
+  console.log(user);
+
   const {
     messages,
     messageInput,
@@ -33,7 +35,7 @@ const ChatInterface = () => {
 
   const messagesEndRef = useRef(null);
   const [createChat, { isLoading: isCreatingChat }] = useCreateChatMutation();
-  const [addMessageToChat] = useAddMessageToChatMutation();
+  // const [addMessageToChat] = useAddMessageToChatMutation();
   const { data: chatListData, isLoading: isLoadingChats } =
     useGetUserChatListQuery();
 
@@ -297,7 +299,6 @@ const ChatInterface = () => {
                   <Bot size={16} className="text-gray-600" />
                 </div>
               )}
-
               <div
                 className={`max-w-md ${msg.sender === "user" ? "order-1" : ""}`}
               >
@@ -311,7 +312,6 @@ const ChatInterface = () => {
                   <p className="text-sm">{msg.text}</p>
                 </div>
               </div>
-
               {msg.sender === "user" && (
                 <div className="flex items-center justify-center flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500">
                   <User size={16} className="text-white" />

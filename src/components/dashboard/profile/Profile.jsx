@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import { X, User, Camera, Mail } from "lucide-react";
 import {
+  useGetUserAboutQuery,
   useGetUserProfileQuery,
+  useUpdateUserAboutMutation,
   useUpdateUserProfileMutation,
 } from "../../../app/authApi";
 import {
@@ -13,11 +15,12 @@ import { setUser } from "../../../features/authSlice";
 import Button from "../../ui/Button";
 
 const ProfileModal = ({ isOpen, onClose }) => {
-  const { user } = useSelector((state) => state.auth);
+  const { data: user } = useGetUserProfileQuery();
+  const { data: about } = useGetUserAboutQuery();
   const dispatch = useDispatch();
-
   const [updateProfile, { isLoading: isUpdating }] =
     useUpdateUserProfileMutation();
+  const [updateAbout] = useUpdateUserAboutMutation();
   const {
     data: profileData,
     isLoading: isLoadingProfile,
@@ -34,9 +37,9 @@ const ProfileModal = ({ isOpen, onClose }) => {
   useEffect(() => {
     if (profileData) {
       setFormData({
-        name: profileData.userName || profileData.name || "",
+        name: profileData.username || profileData.name || "",
         email: profileData.email || "",
-        about: profileData.about || "Football Coach",
+        about: about?.details || "Football Coach",
       });
     } else if (user) {
       setFormData({
@@ -45,7 +48,7 @@ const ProfileModal = ({ isOpen, onClose }) => {
         about: user.about || "Football Coach",
       });
     }
-  }, [profileData, user]);
+  }, [profileData, user, about]);
 
   // Refetch profile data when modal opens
   useEffect(() => {
@@ -72,11 +75,15 @@ const ProfileModal = ({ isOpen, onClose }) => {
 
     try {
       await updateProfile({
-        name: formData.name.trim(),
-        about: formData.about.trim(),
+        username: formData.name.trim(),
+        email: user.email,
+        // about: formData.about.trim(),
       }).unwrap();
 
-      // Update user in Redux store
+      await updateAbout({
+        details: formData.about.trim(),
+      });
+
       dispatch(
         setUser({
           ...user,
@@ -134,9 +141,9 @@ const ProfileModal = ({ isOpen, onClose }) => {
               <div className="flex flex-col items-center mb-6">
                 <div className="relative">
                   <div className="flex items-center justify-center w-24 h-24 mb-3 overflow-hidden rounded-full bg-gradient-to-br from-indigo-400 to-purple-500">
-                    {displayData.photoURL ? (
+                    {displayData.profile_picture ? (
                       <img
-                        src={displayData.photoURL}
+                        src={displayData.profile_picture}
                         alt="Profile"
                         className="object-cover w-full h-full"
                       />
@@ -174,7 +181,7 @@ const ProfileModal = ({ isOpen, onClose }) => {
                       value={formData.name}
                       onChange={handleInputChange}
                       placeholder="Enter your full name"
-                      className="w-full py-3 pl-10 pr-4 transition-colors border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full py-3 pl-10 pr-4 transition-colors border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       required
                     />
                   </div>
@@ -208,7 +215,7 @@ const ProfileModal = ({ isOpen, onClose }) => {
                     value={formData.about}
                     onChange={handleInputChange}
                     rows={3}
-                    className="w-full px-4 py-3 transition-colors border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-4 py-3 transition-colors border border-gray-300 rounded-lg outline-none resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="Tell us about yourself"
                   />
                 </div>
